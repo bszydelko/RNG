@@ -35,7 +35,7 @@ private:
 	char* bufferPosition;
 	//MOUSE PATTERNS-VECTOR OF BITSETS
 
-	
+	std::bitset<8> number_bits;
 
 
 
@@ -65,7 +65,7 @@ public:
 
 	//TODOs
 	void initGeneratingNumbers();
-	void generateNumber();
+	void generateNumber(uint8_t* number, std::vector<POINT>& vec_positions);
 	void disableGeneratingNumbers();
 
 	bool initSavingNumbers(std::string& filename);

@@ -59,4 +59,40 @@ void TRNG::disableReadingPositions()
 	delete input_positions;
 }
 
+void TRNG::initGeneratingNumbers()
+{
+	number_bits.reset();
+}
 
+void TRNG::generateNumber(uint8_t* number, std::vector<POINT>& vec_positions)
+{
+	POINT pos;
+
+	for (auto pos_it = vec_positions.begin(); pos_it != vec_positions.end(); ++pos_it)
+	{
+		pos = *pos_it;
+		
+		if (pos.x <= 63) 
+		{
+			if (pos.y <= 63) number_bits.flip(7); //b7
+			else number_bits.flip(3);//b3
+		}
+		else if (pos.x <= 127)
+		{
+			if (pos.y <= 63) number_bits.flip(6);//b6
+			else number_bits.flip(2);//b2
+		}
+		else if (pos.x <= 191)
+		{
+			if (pos.y <= 63) number_bits.flip(5);//b5
+			else number_bits.flip(1);//b1
+		}
+		else
+		{
+			if (pos.y <= 63) number_bits.flip(4);//b4
+			else number_bits.flip(0);//b0
+		}
+	}
+
+	*number = (uint8_t)(number_bits.to_ulong());
+}
