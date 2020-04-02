@@ -4,82 +4,42 @@
 
 int main()
 {
-	POINT mousePosition;
-	TRNG Trng;
+	const int MAX_NUMBERS = 1; //ile liczb wygenerowac
+	const int MAX_POSITIONS = 1000; //pozycje na 1 liczbe
 
-
-	int numberCounter = 0;
-	const int MAX_NUMBERS = 100; 
-
-	int positionsCounter = 0;
-	const int MAX_POSITIONS = 512;
-
-	std::string positionsFilename = "pozycje.bin";
-	
+	TRNG Trng(MAX_NUMBERS, MAX_POSITIONS);
+	//otwarcie pliku do zapisywania zmapowanych pozycji
+	Trng.openFileSave("pozycje.bin");
+	//pobieranie pozycji kursora i mapowanie, moze zmineic nazwe mapping na inna?
 	Trng.initMapping();
-	Trng.initSavingPositions(positionsFilename);
+	Trng.mapping();
+	//zapisanie i zakmniecie pliku
+	Trng.closeFileSave();
+
+	//otwarcie plikow do odczytu pozycji i zapisu liczb
+	Trng.openFileRead("pozycje.bin");
+	Trng.openFileSave("liczby_losowe.bin");
+	//generowanie liczb
+	Trng.initGeneratingNumbers();
+	Trng.generateNumbers();
+	//zamkniecie wszystkich plikow
+	Trng.closeFileSave();
+	Trng.closeFileRead();
+	//testowe drukowanie wygenerowanych liczb
+	Trng.openFileRead("liczby_losowe.bin");
+	Trng.printNumbers();
+	Trng.closeFileRead();
+
 	
-	while (numberCounter < MAX_NUMBERS)
-	{
-		while (positionsCounter < MAX_POSITIONS)
-		{
-			GetCursorPos(&mousePosition);
-			Sleep(1);
-			Trng.mapPosition(&mousePosition);
-			Trng.savePosistion(&mousePosition);
+	Trng.openFileRead("pozycje.bin");
+	Trng.openFileSave("pozycjeMASK.bin");
 
-			positionsCounter++;
-		}
-		
-		positionsCounter = 0;
-		//std::cout << "number counter: " << numberCounter + 1 << std::endl;
-		numberCounter++;
-	}
+	Trng.initPostprocessing();
+	Trng.postprocessing();
 
-	Trng.disableSavingPositions();
-
-	numberCounter = 0;
-	positionsCounter = 0;
-
-	uint8_t number;
-	POINT position;
-	std::vector<POINT> vec_positions(MAX_POSITIONS);
-
-	Trng.initReadingPositions(positionsFilename);
 	
-
-	while (numberCounter < MAX_NUMBERS)
-	{
-		Trng.initGeneratingNumbers();
-		vec_positions.clear();
-
-		while (positionsCounter < MAX_POSITIONS)
-		{
-			Trng.readPosition(&position);
-			vec_positions.emplace_back(position);
-
-			positionsCounter++;
-		}
-
-		Trng.generateNumber(&number, vec_positions);
-
-		std::cout <<"rn: "<< (int)number << std::endl;
-		positionsCounter = 0;
-		numberCounter++;
-	}
-
-	//TESTING
-	//POINT pos;
-	//int c = 0;
-
-	//Trng.initReadingPositions(positionsFilename);
-	//
-	//while (Trng.readPosition(&pos))
-	//{
-	//	std::cout << pos.x << ", " << pos.y << std::endl;
-	//	//std::cout << ++c << std::endl;
-	//}
-	
+	Trng.closeFileSave();
+	Trng.closeFileRead();
 
 	return 0;
 }

@@ -3,7 +3,6 @@
 #include <fstream>
 #include <string>
 #include <math.h>
-#include <Bits.h>
 #include <bitset>
 #include <vector>
 
@@ -12,6 +11,8 @@
 class TRNG
 {
 private:
+	unsigned int MAX_NUMBERS;
+	unsigned int MAX_POSITIONS;
 	
 	unsigned int SCREEN_WIDTH;
 	unsigned int SCREEN_HEIGHT;
@@ -29,18 +30,25 @@ private:
 	std::string positions_filename;
 	std::string numbers_filename;
 
-	std::ofstream* output_positions;
-	std::ifstream* input_positions;
+	std::ofstream* save_file_handler;
+	std::ifstream* read_file_handler;
 
-	char* bufferPosition;
+	char* point_buffer;
+	char* number_buffer;
 	//MOUSE PATTERNS-VECTOR OF BITSETS
 
 	std::bitset<8> number_bits;
+	std::vector<POINT> positions_per_number;
+
+	bool** image;
+	bool** imageMASK;
 
 
 
 public:
-	TRNG() :
+	TRNG(const unsigned int max_numbers, const unsigned int max_positions) :
+		MAX_NUMBERS(max_numbers),
+		MAX_POSITIONS(max_positions),
 		SCREEN_WIDTH(0),
 		SCREEN_HEIGHT(0),
 		MAP_RATIO_WIDTH(0.0f),
@@ -54,24 +62,36 @@ public:
 
 	void initMapping();
 	void mapPosition(POINT* position);
+	void mapping();
 
-	void initSavingPositions(std::string& filename);
-	void savePosistion(const POINT* position);
-	void disableSavingPositions();
+	void openFileRead(const char* filename);
+	void openFileSave(const char* filename);
 
-	void initReadingPositions(std::string& filename);
-	bool readPosition(POINT* position);
-	void disableReadingPositions();
+	void closeFileRead();
+	void closeFileSave();
 
-	//TODOs
+	void saveToFile(const POINT* position);
+	void saveToFile(const int random_number);
+
+	bool readFromFile(POINT* position);
+	bool readFromFile(int& random_number);
+	
 	void initGeneratingNumbers();
-	void generateNumber(uint8_t* number, std::vector<POINT>& vec_positions);
-	void disableGeneratingNumbers();
+	void generateNumbers();
+	void countNumberBits(int& random_number);
 
-	bool initSavingNumbers(std::string& filename);
-	void saveNumber(unsigned int number);
-	void disableSavingNumbers();
+	void printNumbers();
 
 
+	void initPostprocessing();
+	void resetImage();
+	void postprocessing();
+	void disablePostprocessing();
+
+	void printImage(bool** image); //nie widac za duzo
+
+	//TODO
+	void MASK(bool** input_image, bool** output_image);
+	
 
 };
