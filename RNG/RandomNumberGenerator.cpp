@@ -236,7 +236,10 @@ void TRNG::postprocessing()
 //TODO
 void TRNG::MASK(bool** input_image, bool** output_image)
 {
-
+	//tutaj szyfrowanie mask
+	//powstaje nowy obraz - nakladane sa punkty na wspolrzedne
+	//te wspolrzedne zapisujemy do pliku pozycjeMASK.bin
+	//zapis jednego punktu - jedno wywolanie funkcji saveToFile 
 }
 
 void TRNG::disablePostprocessing()

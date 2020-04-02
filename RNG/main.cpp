@@ -41,6 +41,9 @@ int main()
 	Trng.closeFileSave();
 	Trng.closeFileRead();
 
+	//w sumie potem odczytywanie pozycji po MASKowaniu
+	//i nowe wygenerowanie liczb
+
 	return 0;
 }
 
