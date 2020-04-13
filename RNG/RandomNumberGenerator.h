@@ -41,7 +41,7 @@ private:
 	std::vector<POINT> positions_per_number;
 
 	bool** image;
-	bool** imageMASK;
+	bool** imageArnoldsCat;
 
 
 
@@ -85,13 +85,13 @@ public:
 
 	void initPostprocessing();
 	void resetImage();
-	void postprocessing();
+	void ArnoldsCat();
 	void disablePostprocessing();
 
 	void printImage(bool** image); //nie widac za duzo
 
 	//TODO
-	void MASK(bool** input_image, bool** output_image);
+	void ArnoldsCat(bool** input_image, bool** output_image);
 	
 
 };

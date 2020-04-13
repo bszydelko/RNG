@@ -192,12 +192,12 @@ void TRNG::printNumbers()
 void TRNG::initPostprocessing()
 {
 	image = new bool*[IMAGE_HEIGHT];
-	imageMASK = new bool*[IMAGE_HEIGHT];
+	imageArnoldsCat = new bool*[IMAGE_HEIGHT];
 
 	for (auto i = 0; i < IMAGE_HEIGHT; i++)
 	{
 		image[i] = new bool[IMAGE_WIDTH];
-		imageMASK[i] = new bool[IMAGE_WIDTH];
+		imageArnoldsCat[i] = new bool[IMAGE_WIDTH];
 		//image[i] = malloc(IMAGE_WIDTH * sizeof *image[i]);
 		//imageMASK[i] = malloc(IMAGE_WIDTH * sizeof *image[i]);
 	}
@@ -210,47 +210,95 @@ void TRNG::resetImage()
 		for (auto w = 0; w < IMAGE_WIDTH; w++)
 		{
 			image[h][w] = 0;
-			imageMASK[h][w] = 0;
+			imageArnoldsCat[h][w] = 0;
 		}
 	}
 }
 
-void TRNG::postprocessing()
+void TRNG::ArnoldsCat()
 {
 	POINT position;
+	POINT new_position;
+	int b = 19, c = 3, x_new = 0, y_new = 0;
 
 	while (readFromFile(&position))
 	{
-		resetImage();
+		//resetImage();
 
 		for (auto i = 0; i < MAX_POSITIONS; i++)
 		{
-			image[position.y][position.x] = 1;
+			//image[position.y][position.x] = 1;
+			x_new = (1 * position.x + b * position.x) % IMAGE_WIDTH;
+			y_new = (c * position.y + (b * c + 1) * position.y) % IMAGE_HEIGHT;
+
+			new_position.x = x_new;
+			new_position.y = y_new;
+			saveToFile(&new_position);
 		}
 
-		//MASK(image, imageMASK);
-
 	}
-	printImage(image);
+
+/*
+	closeFileRead();
+	closeFileSave();
+
+	const char* fnArnold = "pozycjeArnoldsCat.bin";
+	const char* fnArnoldPom = "ArnoldCatsPomocniczy.bin";
+
+	for (auto h = 0; h < 5; h++)
+	{
+		std::cout << h << std::endl;
+
+		std::remove(fnArnoldPom);
+
+		openFileRead(fnArnold);
+		openFileSave(fnArnoldPom);
+
+		while (readFromFile(&position))
+		{
+			//resetImage();
+
+			for (auto i = 0; i < MAX_POSITIONS; i++)
+			{
+				//image[position.y][position.x] = 1;
+				x_new = (1 * position.x + b * position.x) % IMAGE_WIDTH;
+				y_new = (c * position.y + (b * c + 1) * position.y) % IMAGE_HEIGHT;
+
+				new_position.x = x_new;
+				new_position.y = y_new;
+				saveToFile(&new_position);
+			}
+
+		}
+
+		std::swap(fnArnold, fnArnoldPom);
+
+		closeFileRead();
+		closeFileSave();
+		
+	}
+
+	openFileRead("pozycjeArnoldsCat.bin");
+	openFileSave("liczby_losowe_ArnoldsCat.bin");
+	//printImage(image);
+	*/
 }
-//TODO
-void TRNG::MASK(bool** input_image, bool** output_image)
-{
+
 	//tutaj szyfrowanie mask
 	//powstaje nowy obraz - nakladane sa punkty na wspolrzedne
 	//te wspolrzedne zapisujemy do pliku pozycjeMASK.bin
 	//zapis jednego punktu - jedno wywolanie funkcji saveToFile 
-}
+
 
 void TRNG::disablePostprocessing()
 {
 	for (auto i = 0; i < IMAGE_WIDTH; i++)
 	{
 		delete [] image[i];
-		delete [] imageMASK[i];
+		delete [] imageArnoldsCat[i];
 	}
 	delete [] image;
-	delete [] imageMASK;
+	delete [] imageArnoldsCat;
 }
 
 void TRNG::printImage(bool** img)
