@@ -4,7 +4,7 @@
 
 int main()
 {
-	const int MAX_NUMBERS = 1; //ile liczb wygenerowac
+	const int MAX_NUMBERS = 2; //ile liczb wygenerowac
 	const int MAX_POSITIONS = 1000; //pozycje na 1 liczbe
 
 	TRNG Trng(MAX_NUMBERS, MAX_POSITIONS);
@@ -29,21 +29,34 @@ int main()
 	Trng.openFileRead("liczby_losowe.bin");
 	Trng.printNumbers();
 	Trng.closeFileRead();
-
+	
 	
 	Trng.openFileRead("pozycje.bin");
-	Trng.openFileSave("pozycjeMASK.bin");
+	Trng.openFileSave("pozycjeArnoldsCat.bin");
 
 	Trng.initPostprocessing();
-	Trng.postprocessing();
+	Trng.ArnoldsCat();
 
 	
 	Trng.closeFileSave();
 	Trng.closeFileRead();
 
+	Trng.openFileRead("pozycjeArnoldsCat.bin");
+	Trng.openFileSave("liczby_losowe_ArnoldsCat.bin");
+
+	Trng.initGeneratingNumbers();
+	Trng.generateNumbers();
 	//w sumie potem odczytywanie pozycji po MASKowaniu
 	//i nowe wygenerowanie liczb
+	Trng.closeFileSave();
+	Trng.closeFileRead();
 
+	std::cout<<"____"<<std::endl;
+
+	Trng.openFileRead("liczby_losowe_ArnoldsCat.bin");
+	Trng.printNumbers();
+	Trng.closeFileRead();
+	
 	return 0;
 }
 
