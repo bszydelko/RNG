@@ -27,6 +27,7 @@ private:
 	float x_map;
 	float y_map;
 	//FILES
+
 	std::string positions_filename;
 	std::string numbers_filename;
 
@@ -64,11 +65,11 @@ public:
 	void mapPosition(POINT* position);
 	void mapping();
 
-	void openFileRead(const char* filename);
-	void openFileSave(const char* filename);
+	void openFileToRead(const char* filename);
+	void openFileToSave(const char* filename);
 
-	void closeFileRead();
-	void closeFileSave();
+	void closeFileToRead();
+	void closeFileToSave();
 
 	void saveToFile(const POINT* position);
 	void saveToFile(const int random_number);
@@ -82,16 +83,16 @@ public:
 
 	void printNumbers();
 
-
 	void initPostprocessing();
 	void resetImage();
-	void ArnoldsCat();
+	void ArnoldsCatMap(int iterations);
 	void disablePostprocessing();
 
 	void printImage(bool** image); //nie widac za duzo
 
-	//TODO
-	void ArnoldsCat(bool** input_image, bool** output_image);
+	void exportToTxtNumbers();
+	void exportToTxtArnoldsNumbers();
+
 	
 
 };

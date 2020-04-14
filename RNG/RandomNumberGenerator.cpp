@@ -1,5 +1,6 @@
 #include "RandomNumberGenerator.h"
 #include <iostream>
+#include <fstream>
 
 void TRNG::initMapping()
 {
@@ -15,61 +16,78 @@ void TRNG::mapPosition(POINT* position)
 	x_map = position->x / MAP_RATIO_WIDTH;
 	y_map = position->y / MAP_RATIO_HEIGHT;
 	//modyfing point
+	int x_map_round = x_map = round(x_map);
+	int y_map_round = y_map = round(y_map);
 
-	if (x_map >= 256) x_map = 255;
-	if (y_map >= 128) y_map = 127;
+	if (x_map_round >= 256) x_map_round %= 255;
+	if (y_map_round >= 128) y_map_round %= 127;
 
-	position->x = round(x_map);
-	position->y = round(y_map);
+	position->x = x_map_round;
+	position->y = y_map_round;
 }
 
 void TRNG::mapping()
 {
-	POINT mousePosition;
+	POINT mousePositionCurrent;
+	POINT mousePositionPrevious;
 
 	int numberCounter = 0;
 	int positionsCounter = 0;
 
+	GetCursorPos(&mousePositionPrevious);
+
 	while (numberCounter < MAX_NUMBERS)
 	{
+		
 		while (positionsCounter < MAX_POSITIONS)
 		{
-			GetCursorPos(&mousePosition);
-			Sleep(1);
-			mapPosition(&mousePosition);
-			saveToFile(&mousePosition);
+			GetCursorPos(&mousePositionCurrent);
+			
+			while (abs(mousePositionCurrent.x - mousePositionPrevious.x) <= 1 ||
+				abs(mousePositionCurrent.y - mousePositionPrevious.y) <= 1) 
+			{
+				GetCursorPos(&mousePositionCurrent);
+			}
+
+			mousePositionPrevious.x = mousePositionCurrent.x;
+			mousePositionPrevious.y = mousePositionCurrent.y;
+
+			mapPosition(&mousePositionCurrent);
+			saveToFile(&mousePositionCurrent);
 
 			positionsCounter++;
+			
 		}
-
+		system("CLS");
 		positionsCounter = 0;
-		//std::cout << "number counter: " << numberCounter + 1 << std::endl;
+		std::cout << "liczby:  " << numberCounter + 1 << "/ " <<MAX_NUMBERS<< std::endl;
 		numberCounter++;
 	}
 }
 
 
-void TRNG::openFileRead(const char* filename)
+void TRNG::openFileToRead(const char* filename)
 {
+
 	read_file_handler = new std::ifstream(filename, std::ios::binary);
 	point_buffer = new char[sizeof(POINT)];
 	number_buffer = new char[sizeof(int)];
 }
 
-void TRNG::openFileSave(const char* filename)
+void TRNG::openFileToSave(const char* filename)
 {
 	save_file_handler = new std::ofstream(filename, std::ios::binary | std::ios::out | std::ios::app);
 }
 
 
-void TRNG::closeFileRead()
+void TRNG::closeFileToRead()
 {
 	delete [] point_buffer;
 	delete [] number_buffer;
 	delete read_file_handler;
 }
 
-void TRNG::closeFileSave()
+void TRNG::closeFileToSave()
 {
 	delete save_file_handler;
 }
@@ -198,8 +216,6 @@ void TRNG::initPostprocessing()
 	{
 		image[i] = new bool[IMAGE_WIDTH];
 		imageArnoldsCat[i] = new bool[IMAGE_WIDTH];
-		//image[i] = malloc(IMAGE_WIDTH * sizeof *image[i]);
-		//imageMASK[i] = malloc(IMAGE_WIDTH * sizeof *image[i]);
 	}
 }
 
@@ -215,79 +231,59 @@ void TRNG::resetImage()
 	}
 }
 
-void TRNG::ArnoldsCat()
+void TRNG::ArnoldsCatMap(int iterations = 2)
 {
 	POINT position;
 	POINT new_position;
-	int b = 19, c = 3, x_new = 0, y_new = 0;
+	int b = 134, c = 84, x_new = 0, y_new = 0;
 
 	while (readFromFile(&position))
 	{
-		//resetImage();
+		x_new = (1 * position.x + b * position.x) % IMAGE_WIDTH;
+		y_new = (c * position.y + (b + c + 1) * position.y) % IMAGE_HEIGHT;
 
-		for (auto i = 0; i < MAX_POSITIONS; i++)
+		new_position.x = x_new;
+		new_position.y = y_new;
+		saveToFile(&new_position);
+
+	}
+
+	closeFileToRead();
+	closeFileToSave();
+
+	const char* fnArnold = "pozycjeArnoldsCat.bin";
+	const char* fnArnoldPom = "pozycjeArnoldsCatTEMP.bin";
+
+	for (auto i = 0; i < iterations; i++) 
+	{
+		std::cout << i << std::endl;
+
+		openFileToRead(fnArnold);
+		openFileToSave(fnArnoldPom);
+
+		while (readFromFile(&position))
 		{
-			//image[position.y][position.x] = 1;
 			x_new = (1 * position.x + b * position.x) % IMAGE_WIDTH;
 			y_new = (c * position.y + (b * c + 1) * position.y) % IMAGE_HEIGHT;
 
 			new_position.x = x_new;
 			new_position.y = y_new;
 			saveToFile(&new_position);
-		}
-
-	}
-
-/*
-	closeFileRead();
-	closeFileSave();
-
-	const char* fnArnold = "pozycjeArnoldsCat.bin";
-	const char* fnArnoldPom = "ArnoldCatsPomocniczy.bin";
-
-	for (auto h = 0; h < 5; h++)
-	{
-		std::cout << h << std::endl;
-
-		std::remove(fnArnoldPom);
-
-		openFileRead(fnArnold);
-		openFileSave(fnArnoldPom);
-
-		while (readFromFile(&position))
-		{
-			//resetImage();
-
-			for (auto i = 0; i < MAX_POSITIONS; i++)
-			{
-				//image[position.y][position.x] = 1;
-				x_new = (1 * position.x + b * position.x) % IMAGE_WIDTH;
-				y_new = (c * position.y + (b * c + 1) * position.y) % IMAGE_HEIGHT;
-
-				new_position.x = x_new;
-				new_position.y = y_new;
-				saveToFile(&new_position);
-			}
 
 		}
 
+		closeFileToRead();
+		closeFileToSave();
+
+		std::remove(fnArnold);
 		std::swap(fnArnold, fnArnoldPom);
 
-		closeFileRead();
-		closeFileSave();
-		
 	}
 
-	openFileRead("pozycjeArnoldsCat.bin");
-	openFileSave("liczby_losowe_ArnoldsCat.bin");
-	//printImage(image);
-	*/
-}
+	openFileToRead("pozycje.bin");
+	openFileToSave("pozycjeArnoldsCat.bin");
 
-	//tutaj szyfrowanie mask
-	//powstaje nowy obraz - nakladane sa punkty na wspolrzedne
-	//te wspolrzedne zapisujemy do pliku pozycjeMASK.bin
-	//zapis jednego punktu - jedno wywolanie funkcji saveToFile 
+}
 
 
 void TRNG::disablePostprocessing()
@@ -314,4 +310,40 @@ void TRNG::printImage(bool** img)
 			//else std::cout << " ";
 		}
 	}
+}
+
+void TRNG::exportToTxtNumbers()
+{
+	std::ofstream fileTxt;
+	fileTxt.open("liczbyLosowe.txt");
+
+	openFileToRead("liczby_losowe.bin");
+	
+	int number = 0;
+
+	while (readFromFile(number))
+	{
+		fileTxt << number << "\n";
+	}
+
+	fileTxt.close();
+	closeFileToRead();
+}
+
+void TRNG::exportToTxtArnoldsNumbers()
+{
+	std::ofstream fileTxt;
+	fileTxt.open("liczbyLosoweArnoldsCat.txt");
+
+	openFileToRead("liczby_losowe_ArnoldsCat.bin");
+
+	int number = 0;
+
+	while (readFromFile(number))
+	{
+		fileTxt << number << "\n";
+	}
+
+	fileTxt.close();
+	closeFileToRead();
 }
