@@ -135,33 +135,23 @@ void TRNG::initGeneratingNumbers()
 
 void TRNG::generateNumbers()
 {
-	int numberCounter = 0;
-	int positionsCounter = 0;
-
-	int random_number;
+	int random_number = 0;
 	POINT position;
 
 	positions_per_number.reserve(MAX_POSITIONS);
 
-	while (numberCounter < MAX_NUMBERS)
+	while (readFromFile(&position))
 	{
-		positions_per_number.clear();
+		positions_per_number.emplace_back(position);
 
-		while (positionsCounter < MAX_POSITIONS)
+		if (positions_per_number.size() == MAX_POSITIONS)
 		{
-			readFromFile(&position);
-			positions_per_number.emplace_back(position);
+			countNumberBits(random_number);
+			saveToFile(random_number);
 
-			positionsCounter++;
+			positions_per_number.clear();
 		}
-
-		countNumberBits(random_number);
-
-		saveToFile(random_number);
 		//std::cout << "rn: " << (int)random_number << std::endl;
-		
-		positionsCounter = 0;
-		numberCounter++;
 	}
 }
 

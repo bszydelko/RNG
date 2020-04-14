@@ -11,7 +11,7 @@
 class TRNG
 {
 private:
-	unsigned int MAX_NUMBERS;
+	mutable unsigned int MAX_NUMBERS;
 	unsigned int MAX_POSITIONS;
 	
 	unsigned int SCREEN_WIDTH;

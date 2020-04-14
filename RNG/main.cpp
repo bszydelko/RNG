@@ -4,7 +4,7 @@
 
 int main()
 {
-	const int MAX_NUMBERS =5; //ile liczb wygenerowac
+	int MAX_NUMBERS = 10000; //ile liczb wygenerowac
 	const int MAX_POSITIONS = 512; //pozycje na 1 liczbe
 
 	TRNG Trng(MAX_NUMBERS, MAX_POSITIONS);
@@ -35,7 +35,7 @@ int main()
 		{
 			//otwarcie pliku do zapisywania zmapowanych pozycji
 			Trng.openFileToSave("pozycje.bin");
-			//pobieranie pozycji kursora i mapowanie, moze zmineic nazwe mapping na inna?
+			//pobieranie pozycji kursora i mapowanie
 			Trng.initMapping();
 			Trng.mapping();
 			//zapisanie i zakmniecie pliku
