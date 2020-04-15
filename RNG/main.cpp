@@ -68,8 +68,8 @@ int main()
 			Trng.initPostprocessing();
 			//liczba iteracji musi byc parzysta
 			//domyslnie jest 2
-			//384 iteracje przywracaja oryginalne liczby;
-			Trng.ArnoldsCatMap(12); 
+			//348 iteracje przywracaja oryginalne liczby;
+			Trng.ArnoldsCatMap(174); 
 
 			Trng.closeFileToSave();
 			Trng.closeFileToRead();

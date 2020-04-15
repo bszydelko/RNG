@@ -43,8 +43,8 @@ void TRNG::mapping()
 		{
 			GetCursorPos(&mousePositionCurrent);
 			
-			while (abs(mousePositionCurrent.x - mousePositionPrevious.x) <= 1 ||
-				abs(mousePositionCurrent.y - mousePositionPrevious.y) <= 1) 
+			while (abs(mousePositionCurrent.x - mousePositionPrevious.x) < 1 ||
+				abs(mousePositionCurrent.y - mousePositionPrevious.y) < 1) 
 			{
 				GetCursorPos(&mousePositionCurrent);
 			}
